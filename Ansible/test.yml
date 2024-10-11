@@ -1,0 +1,5 @@
+---
+- hosts: prod-server
+  tasks:
+    - name: Check which Python interpreter is being used
+      command: python -V

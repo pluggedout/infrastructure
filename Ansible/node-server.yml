@@ -1,0 +1,49 @@
+---
+- name: Install Node.js 20 and Yarn on Ubuntu 22+
+  hosts: all
+  become: true
+  vars:
+    is_development: false  # Set this to true for development servers
+
+  tasks:
+
+    - name: "Add Node.js 20.x apt key"
+      ansible.builtin.apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+
+    - name: "Add Node.js 20.x apt repository"
+      ansible.builtin.apt_repository:
+        repo: deb https://deb.nodesource.com/node_20.x jammy main # on newer versions such as noble node 20 isn't yet supported
+        update_cache: true
+
+    - name: "Install Node.js"
+      ansible.builtin.apt:
+        name: nodejs
+        update_cache: true
+        state: present
+
+    - name: "Install Yarn repository GPG key"
+      ansible.builtin.apt_key:
+        url: https://dl.yarnpkg.com/debian/pubkey.gpg
+        state: present
+
+    - name: "Add Yarn repository"
+      ansible.builtin.apt_repository:
+        repo: deb https://dl.yarnpkg.com/debian/ stable main
+        update_cache: true
+
+    - name: "Install Yarn"
+      ansible.builtin.apt:
+        name: yarn
+        state: present
+        update_cache: true
+
+    - name: "Install nodemon and @angular/cli if development server"
+      when: is_development
+      community.general.npm:
+        global: true
+        name: "{{ item }}"
+      with_items:
+        - 'nodemon'
+        - '@angular/cli'
