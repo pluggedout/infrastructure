@@ -1,5 +1,5 @@
 # node-server.yml
 ```bash
-ansible-playbook -i ~/ansible-inventory node-server.yml -l production
+ansible-playbook node-server.yml -u linuxuser --private-key=/home/linuxuser/.ssh/id_rsa
 ```
 
