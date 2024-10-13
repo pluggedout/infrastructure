@@ -47,3 +47,17 @@
       with_items:
         - 'nodemon'
         - '@angular/cli'
+
+    - name: "Ensure /usr/bin/python points to /usr/bin/python3"
+      ansible.builtin.file:
+        src: /usr/bin/python3
+        dest: /usr/bin/python
+        state: link
+        force: yes
+      notify:
+        - "Verify Python Symlink"
+
+  handlers:
+    - name: "Verify Python Symlink"
+      debug:
+        msg: "Symbolic link /usr/bin/python -> /usr/bin/python3 has been created/updated."

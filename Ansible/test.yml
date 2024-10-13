@@ -3,5 +3,11 @@
   hosts: prod-server
   tasks:
     - name: Check which Python interpreter is being used
-      ansible.builtin.command: python -V
+      ansible.builtin.shell: |
+        python -V
       changed_when: false
+      register: out
+
+    - name: Print value
+      ansible.builtin.debug:
+        msg: "{{ out }}"
