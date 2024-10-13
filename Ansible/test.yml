@@ -1,5 +1,7 @@
 ---
-- hosts: prod-server
+- name: "Test server"
+  hosts: prod-server
   tasks:
     - name: Check which Python interpreter is being used
-      command: python -V
+      ansible.builtin.command: python -V
+      changed_when: false
