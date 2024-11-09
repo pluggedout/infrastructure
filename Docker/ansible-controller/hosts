@@ -1,0 +1,10 @@
+# Example Ansible Hosts File
+
+# Web servers group
+# [webservers]  # Uncomment to define a webservers group
+# server1.example.com  # IP or hostname of server 1
+# server2.example.com  # IP or hostname of server 2
+
+# Localhost group for running Ansible on the local machine
+[local]
+localhost ansible_connection=local

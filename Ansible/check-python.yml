@@ -1,6 +1,6 @@
 ---
 - name: "Check-python"
-  hosts: prod-server
+  hosts: all
   tasks:
     - name: Check which Python interpreter is being used
       ansible.builtin.shell: |
