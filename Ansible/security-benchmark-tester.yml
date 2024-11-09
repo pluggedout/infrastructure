@@ -1,0 +1,45 @@
+---
+- name: Run Lynis audit
+  hosts: all
+  become: true
+  vars:
+    lynis_dest: "/opt/lynis"
+
+  tasks:
+    - name: Run Lynis audit in non-interactive mode
+      ansible.builtin.command: "./lynis audit system --cronjob"
+      args:
+        chdir: "{{ lynis_dest }}"
+      register: lynis_audit_result
+      ignore_errors: true
+      changed_when: false
+
+#    - name: Display Lynis audit output
+#      ansible.builtin.debug:
+#        msg: "{{ lynis_audit_result.stdout }}"
+
+    - name: Read Lynis report file
+      ansible.builtin.slurp:
+        src: /var/log/lynis-report.dat
+      register: lynis_report_raw
+
+    - name: Decode Lynis report content
+      ansible.builtin.set_fact:
+        lynis_report_content: "{{ lynis_report_raw.content | b64decode }}"
+
+    - name: Extract Lynis audit score
+      ansible.builtin.set_fact:
+        lynis_audit_score: "{{ lynis_report_content | regex_search('hardening_index=(\\d+)', '\\1') }}"
+
+    - name: Display Lynis audit score
+      ansible.builtin.debug:
+        msg: "Lynis audit score on {{ inventory_hostname }}: {{ lynis_audit_score }}"
+
+    - name: Extract Lynis warnings
+      ansible.builtin.set_fact:
+        lynis_warnings: "{{ lynis_report_content | regex_findall('warning_message=(.+)') }}"
+
+    - name: Display Lynis warnings
+      ansible.builtin.debug:
+        msg: "Lynis warnings on {{ inventory_hostname }}:\n{{ lynis_warnings | join('\n') }}"
+      when: lynis_warnings | length > 0
