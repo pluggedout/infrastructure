@@ -1,5 +1,5 @@
 ---
-- name: "Test server"
+- name: "Check-python"
   hosts: prod-server
   tasks:
     - name: Check which Python interpreter is being used
