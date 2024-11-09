@@ -1,0 +1,45 @@
+---
+- name: Install rkhunter and clone Lynis repository
+  hosts: all
+  become: true
+  vars:
+    rkhunter_debian_package: "rkhunter"
+    rkhunter_rhel_package: "rkhunter"
+    lynis_repo: "https://github.com/CISOfy/lynis"
+    lynis_dest: "/opt/lynis"
+    lynis_bin: "{{ lynis_dest }}/lynis"
+
+  tasks:
+    - name: Install rkhunter on Debian-based systems
+      ansible.builtin.apt:
+        name: "{{ rkhunter_debian_package }}"
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: Install rkhunter on RHEL-based systems
+      ansible.builtin.dnf:
+        name: "{{ rkhunter_rhel_package }}"
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Check if lynis binary exists
+      ansible.builtin.stat:
+        path: "{{ lynis_bin }}"
+      register: lynis_stat
+
+    - name: Clone Lynis repository if not already cloned
+      ansible.builtin.git:
+        repo: "{{ lynis_repo }}"
+        dest: "{{ lynis_dest }}"
+        version: 'master'
+      when: not lynis_stat.stat.exists
+      register: lynis_clone
+      changed_when: lynis_clone is changed
+
+    - name: Set permissions on Lynis directory
+      ansible.builtin.file:
+        path: "{{ lynis_dest }}"
+        owner: root
+        group: root
+        mode: '0755'
